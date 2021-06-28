@@ -1,0 +1,308 @@
+﻿<Page
+    x:Class="FluentStore.Views.ProductDetailsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:tkcontrols="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:FluentStore.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:storeModels="using:MicrosoftStore.Models"
+    xmlns:viewModels="using:FluentStore.ViewModels"
+    xmlns:converters="using:FluentStore.Converters"
+    xmlns:controls="using:FluentStore.Controls"
+    xmlns:tkconverters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    mc:Ignorable="d"
+    SizeChanged="Page_SizeChanged"
+    NavigationCacheMode="Disabled"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <tkconverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <tkconverters:CollectionVisibilityConverter x:Key="CollectionVisibilityConverter"/>
+        <converters:PlatWindowsEnumToVisibility x:Key="PlatWindowsEnumToVisibility"/>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <ParallaxView Source="{x:Bind ContentScroller}" VerticalShift="200" VerticalSourceOffsetKind="Absolute">
+            <Image x:Name="HeroImage" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Uniform">
+                <Image.Source>
+                    <BitmapImage UriSource="{x:Bind ViewModel.HeroImage, TargetNullValue=//:0}" ImageOpened="HeroImage_ImageOpened"/>
+                </Image.Source>
+            </Image>
+        </ParallaxView>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="0*" />
+            </Grid.ColumnDefinitions>
+
+            <!--<Grid Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" RowSpacing="10" Padding="0,15,15,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Ratings and Reviews" Style="{ThemeResource NavigationViewItemHeaderTextStyle}"/>
+                <StackPanel Orientation="Horizontal" Spacing="10" Grid.Row="1">
+                    <TextBlock Text="{x:Bind ViewModel.GetAverageRatingString()}" FontSize="24" FontWeight="Bold"/>
+                    <RatingControl Value="{x:Bind ViewModel.Product.AverageRating}" IsReadOnly="True" VerticalAlignment="Bottom"/>
+                </StackPanel>
+                <Button Style="{ThemeResource AccentButtonStyle}" Padding="10" Grid.Row="1" HorizontalAlignment="Right"
+                        Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <FontIcon Glyph="&#xE1CE;"/>
+                        <TextBlock Text="Rate this app"/>
+                    </StackPanel>
+                </Button>
+                <ScrollViewer Grid.Row="2">
+                    <StackPanel Spacing="10">
+                        <Grid Background="{ThemeResource SystemChromeLowColor}"
+                                ColumnSpacing="10" CornerRadius="4" Padding="15">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <PersonPicture MaxWidth="32"/>
+                            <TextBlock Text="Joe Mama" FontWeight="Bold"
+                                        Grid.Column="1" VerticalAlignment="Center"/>
+                            <TextBlock Text="July 17, 2020 2:22 AM" Foreground="{ThemeResource SystemBaseMediumHighColor}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1"/>
+                            <RatingControl Value="2.5" IsReadOnly="True" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"/>
+                            <TextBlock Text="What does it even do?" Margin="0,5,0,0"
+                                        TextWrapping="Wrap" Grid.Row="2" Grid.Column="1" FontSize="16"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>-->
+
+            <ScrollViewer Grid.Column="0" x:Name="ContentScroller">
+                <StackPanel Spacing="20">
+                    <Border x:Name="HeroImageSpacer"/>
+                    <Grid Grid.Row="1" Padding="20,0,20,20" ColumnSpacing="20" Margin="20,0" MaxHeight="300"
+                          Background="{ThemeResource SystemControlAcrylicElementMediumHighBrush}"
+                          x:Name="InfoCard" CornerRadius="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition x:Name="DescriptionRow" Height="4*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Viewbox MaxWidth="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MaxHeight}" MaxHeight="100"
+                                 Margin="0,20,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Image>
+                                <Image.Source>
+                                    <BitmapImage UriSource="{x:Bind ViewModel.AppIcon.Uri}"/>
+                                </Image.Source>
+                            </Image>
+                        </Viewbox>
+                        <CommandBar x:Name="ContentAppBar" Visibility="Collapsed"
+                                    HorizontalContentAlignment="Left" VerticalAlignment="Center" DefaultLabelPosition="Right"
+                                    Grid.Column="1" Grid.ColumnSpan="2" Padding="0" BorderThickness="0" Background="Transparent">
+                            <CommandBar.Content>
+                                <TextBlock Text="{x:Bind ViewModel.Product.Title}" ToolTipService.ToolTip="{x:Bind ViewModel.Product.Title}"
+                                           HorizontalAlignment="Left" FontSize="30" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                            </CommandBar.Content>
+
+                            <CommandBar.PrimaryCommands>
+                                <AppBarElementContainer VerticalContentAlignment="Center" HorizontalContentAlignment="Left">
+                                    <TextBlock Text="{x:Bind ViewModel.Product.DisplayPrice, Mode=OneWay}"
+                                               FontSize="16" FontWeight="SemiBold" Padding="8" TextLineBounds="Tight"
+                                               VerticalAlignment="Center"/>
+                                </AppBarElementContainer>
+                                <AppBarButton Label="Add to Collection">
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xECCD;" />
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                <AppBarButton Label="Install" x:Name="InstallButton">
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xECAA;" />
+                                    </AppBarButton.Icon>
+                                    <AppBarButton.Flyout>
+                                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                            <MenuFlyoutItem Icon="Download" Text="Download installer" ToolTipService.ToolTip="Downloads the app without installing it"
+                                                            Click="Download_Click"/>
+                                            <MenuFlyoutItem Text="Install with App Installer" ToolTipService.ToolTip="Installs the app using Microsoft's App Installer"
+                                                            Click="InstallUsingAppInstaller_Click" x:Name="InstallUsingAppInstallerMenuItem">
+                                                <MenuFlyoutItem.Icon>
+                                                    <BitmapIcon UriSource="Assets/AppPackageAppList.png"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </AppBarButton.Flyout>
+                                </AppBarButton>
+                            </CommandBar.PrimaryCommands>
+                        </CommandBar>
+                        <TextBlock x:Name="DescriptionBlock" Grid.Row="1" Grid.Column="1" FontSize="16" Margin="0,-12,0,0"
+                                   Foreground="{ThemeResource SystemBaseMediumHighColor}" Grid.ColumnSpan="2"
+                                   Text="{x:Bind ViewModel.Product.Description}"
+                                   TextTrimming="WordEllipsis" TextWrapping="Wrap" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10" Grid.ColumnSpan="2">
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.Product.PublisherName}" />
+                            <Ellipse Width="3" Height="3" VerticalAlignment="Center" Fill="{ThemeResource SystemBaseHighColor}" StrokeThickness="0" />
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.Product.Categories[0]}" />
+                        </StackPanel>
+                        <HyperlinkButton x:Name="MoreButton" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right"
+                                         Click="MoreButton_Click" Content="More" RelativePanel.Below="DescriptionBlock"
+                                         Visibility="{Binding ElementName=DescriptionBlock, Path=IsTextTrimmed}" />
+                    </Grid>
+                    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                                Padding="20" Spacing="20">
+                        <StackPanel Spacing="10">
+                            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Text="Available on" />
+                            <StackPanel Padding="0" Spacing="0">
+                                <StackPanel.Resources>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Padding" Value="10"/>
+                                        <Setter Property="Spacing" Value="10"/>
+                                        <Setter Property="Orientation" Value="Horizontal"/>
+                                        <Setter Property="Margin" Value="0,0,10,0"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <StackPanel Visibility="{x:Bind ViewModel, ConverterParameter=Desktop, Converter={StaticResource PlatWindowsEnumToVisibility}}">
+                                    <FontIcon Glyph="&#xE977;" />
+                                    <TextBlock Text="PC" />
+                                </StackPanel>
+                                <StackPanel Visibility="{x:Bind ViewModel, ConverterParameter=Xbox, Converter={StaticResource PlatWindowsEnumToVisibility}}">
+                                    <FontIcon Glyph="&#xE990;" />
+                                    <TextBlock Text="Xbox One" />
+                                </StackPanel>
+                                <StackPanel Visibility="{x:Bind ViewModel, ConverterParameter=Holographic, Converter={StaticResource PlatWindowsEnumToVisibility}}">
+                                    <FontIcon FontFamily="Hololens MDL2 Assets" Glyph="&#xF132;" />
+                                    <TextBlock Text="Hololens" />
+                                </StackPanel>
+                                <StackPanel Visibility="{x:Bind ViewModel, ConverterParameter=Mobile, Converter={StaticResource PlatWindowsEnumToVisibility}}">
+                                    <FontIcon Glyph="&#xE1C9;" />
+                                    <TextBlock Text="Mobile" />
+                                </StackPanel>
+                                <StackPanel Visibility="{x:Bind ViewModel, ConverterParameter=Team, Converter={StaticResource PlatWindowsEnumToVisibility}}">
+                                    <FontIcon Glyph="&#xE8AE;" />
+                                    <TextBlock Text="Hub" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Spacing="10" Visibility="{x:Bind ViewModel.Screenshots, Converter={StaticResource CollectionVisibilityConverter}}">
+                            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Text="Screenshots" />
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Auto">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.Screenshots}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel MaxHeight="150" Orientation="Horizontal" Spacing="10" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="storeModels:ImageItem">
+                                            <Image>
+                                                <Image.Source>
+                                                    <BitmapImage UriSource="{x:Bind GetSource()}"
+                                                                 DecodePixelHeight="{x:Bind Height}"
+                                                                 DecodePixelWidth="{x:Bind Width}"/>
+                                                </Image.Source>
+                                            </Image>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </StackPanel>
+                        <StackPanel Spacing="10">
+                            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Text="Features" />
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.Product.Features}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="5" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <TextBlock Text="{x:Bind}" TextWrapping="Wrap" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                        <StackPanel Spacing="10">
+                            <TextBlock Style="{ThemeResource NavigationViewItemHeaderTextStyle}" Text="What's new" />
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.Product.Notes}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="5" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <TextBlock Text="{x:Bind}" TextWrapping="Wrap" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <CommandBar x:Name="BottomAppBar" Grid.Row="1" HorizontalContentAlignment="Left" DefaultLabelPosition="Right"
+                    Visibility="Visible">
+            <CommandBar.Content>
+                <TextBlock Text="{x:Bind ViewModel.Product.Title}" ToolTipService.ToolTip="{x:Bind ViewModel.Product.Title}"
+                           HorizontalAlignment="Left" FontSize="30" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+            </CommandBar.Content>
+
+            <CommandBar.PrimaryCommands>
+                <AppBarElementContainer VerticalContentAlignment="Center">
+                    <TextBlock Text="{x:Bind ViewModel.Product.DisplayPrice, Mode=OneWay}" VerticalAlignment="Center"
+                               FontSize="16" FontWeight="SemiBold" Padding="0,0,8,0" TextLineBounds="Tight"/>
+                </AppBarElementContainer>
+                <AppBarButton Label="Add to Collection">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xECCD;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Label="Install">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xECAA;" />
+                    </AppBarButton.Icon>
+                    <AppBarButton.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                            <MenuFlyoutItem Icon="Download" Text="Download installer" ToolTipService.ToolTip="Downloads the app without installing it"
+                                            Click="Download_Click"/>
+                            <MenuFlyoutItem Text="Install with App Installer" ToolTipService.ToolTip="Installs the app using Microsoft's App Installer"
+                                            Click="InstallUsingAppInstaller_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <BitmapIcon UriSource="Assets/AppPackageAppList.png"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+        
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource CompactModeMinWidth}" />
+                    </VisualState.StateTriggers>
+
+                    <VisualState.Setters>
+                        <Setter Target="ContentAppBar.Visibility" Value="Visible"/>
+                        <Setter Target="BottomAppBar.Visibility" Value="Collapsed"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</Page>
