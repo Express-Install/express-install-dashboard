@@ -24,7 +24,7 @@
                 <Viewbox>
                     <Image Source="/Assets/Square71x71Logo.png"/>
                 </Viewbox>
-                <TextBlock Text="Fluent Store" Style="{ThemeResource SubtitleTextBlockStyle}"
+                <TextBlock Text="Express Install" Style="{ThemeResource SubtitleTextBlockStyle}"
                            VerticalAlignment="Center" Margin="4,0" FontSize="20"/>
             </StackPanel>
         </winui:NavigationView.PaneHeader>
